@@ -5,9 +5,9 @@ Intro
 -----
 > This is based off a old YR9 project I did.
 
-As of now just building on it / removing bugs.
+There is the old version, with nothing new, and the new version, with extra functionanlity (made in Y10)
 
-New Features
-------------
+Versions
+--------
 
-- [BASE]: Moderators, Commands
+v1.0.5 [NEW STRAND] Fixed commands and added emoticons
