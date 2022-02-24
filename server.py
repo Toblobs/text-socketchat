@@ -1,7 +1,7 @@
 ### The revamped Chattap
 ### A Synergy Studios Project
 
-version_tag = '1.0.5'
+version_tag = '1.0.6'
 
 import socket
 from packet import Packet
@@ -32,11 +32,11 @@ class SocketServer:
         self.banned_addr = []
 
         self.all_commands = ('/message', '/name', '/whisper',
-                             '/mod', '/ban', '/kick', '/mute', '/unmute', '/slowchat',
+                             '/mod', '/ban', '/kick', '/mute', '/unmute', '/slowchat', '/charlimit',
                              '/vertag', '/sys-notice')
 
-        self.user_commands = ('/message', '/name', '/whisper', '/block')
-        self.mod_commands = ('/mod', '/ban', '/kick', '/mute', '/unmute', '/slowchat')
+        self.user_commands = ('/message', '/name', '/whisper')
+        self.mod_commands = ('/mod', '/ban', '/kick', '/mute', '/unmute', '/slowchat', '/charlimit')
         self.sys_commands = ('/vertag', '/sys-notice')
 
         self.max_users = 100
@@ -278,7 +278,7 @@ class SocketServer:
 
                         if cs_to_ban:
 
-                            self.broadcast(Packet('/message', f'[SERVER] [!] Client {self.client_sockets[cs_to_ban]} was banned!'))
+                            self.broadcast(Packet('/message', f'[SERVER] [!] Client {self.client_sockets[cs_to_ban][1]} was banned!'))
 
                             print(f'[/] Client {client_tuple} banned {self.client_sockets[cs_to_ban]} for reason: {further_details}')
                             self.ban_client(cs_to_ban, further_details)
@@ -289,7 +289,7 @@ class SocketServer:
 
                         if cs_to_kick:
 
-                            self.broadcast(Packet('/message', f'[SERVER] [!] Client {self.client_sockets[cs_to_kick]} was kicked!'))
+                            self.broadcast(Packet('/message', f'[SERVER] [!] Client {self.client_sockets[cs_to_kick][1]} was kicked!'))
 
                             print(f'[/] Client {client_tuple} kicked {self.client_sockets[cs_to_kick]} for reason: {further_details}')
                             self.kick_client(cs_to_kick, further_details)
@@ -302,7 +302,7 @@ class SocketServer:
                             print(f'[/] Client {client_tuple} muted {self.client_sockets[cs_to_mute]} for reason: {further_details}')
                             self.mute_client(cs_to_mute, further_details)
 
-                            self.broadcast(Packet('/message', f'[SERVER] [!] Client {self.client_sockets[cs_to_mute[1]]} was muted!'))
+                            self.broadcast(Packet('/message', f'[SERVER] [!] Client {self.client_sockets[cs_to_mute][1]} was muted!'))
 
                     elif packet.comm == '/unmute':
 
@@ -312,13 +312,19 @@ class SocketServer:
                             print(f'[/] Client {client_tuple} unmuted {self.client_sockets[cs_to_unmute]}')
                             self.unmute_client(cs_to_unmute)
 
-                            self.broadcast(Packet('/message', f'[SERVER] [!] Client {self.client_sockets[cs_to_unmute[1]]} was unmuted!'))
+                            self.broadcast(Packet('/message', f'[SERVER] [!] Client {self.client_sockets[cs_to_unmute][1]} was unmuted!'))
 
                     elif packet.comm == '/slowchat':
 
                         new_slowchat = packet.det
                         
                         self.broadcast(Packet('/slowchat', new_slowchat))
+
+                    elif packet.comm == '/charlimit':
+
+                        new_charlimit = packet.det
+                        
+                        self.broadcast(Packet('/charlimit', new_charlimit))
                         
 
             # Level 3 - Sys Commands

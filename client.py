@@ -1,7 +1,7 @@
 ### The revamped Chattap
 ### A Synergy Stuidos Project
 
-version_tag = '1.0.5'
+version_tag = '1.0.6'
 
 import socket
 from packet import Packet
@@ -35,7 +35,7 @@ class SocketClient:
         self.byte_limit = 2048
         
         self.command_inputs = {'slowchat': 2.5,
-                               'char_limit': 500,
+                               'char_limit': 100,
                                'muted': False}
 
         self.banned_chars = ['%', '[', ']', '@']
@@ -102,18 +102,23 @@ class SocketClient:
 
         elif packet.comm == '/muted':
             
-            print('\n' + '-> [!] You have been muted! Reason -> ' + packet.det)
+            print('\n' + '-> [SERVER] [!] You have been muted! Reason -> ' + packet.det)
             self.command_inputs['muted'] = True
 
         elif packet.comm == '/unmuted':
 
-            print('\n' + '-> ' + '[!] You have been unmuted!')
+            print('\n' + '-> ' + '[SERVER] [!] You have been unmuted!')
             self.command_inputs['muted'] = False
 
         elif packet.comm == '/slowchat':
 
-            print('\n' + '-> ' + f'[!] The slowchat has been set to {packet.det} seconds.')
+            print('\n' + '-> ' + f'[SERVER] [!] The slowchat has been set to {packet.det} seconds!')
             self.command_inputs['slowchat'] = int(packet.det)
+
+        elif packet.comm == '/charlimit':
+
+            print('\n' + '-> ' + f'[SERVER] [!] The character limit has been set to {packet.det} characters!')
+            self.command_inputs['char_limit'] = int(packet.det)
 
         else:
             
@@ -168,6 +173,7 @@ class SocketClient:
 
         print('To send a private message: /whisper <name_of_person>#<message>')
         print('To change your name: /name <new_name>')
+        print('To send an emoticon: :yikes: -> (|__|”)')
         print()
 
         print('-' * 30)
@@ -187,7 +193,7 @@ class SocketClient:
 
             message = self.check_emoticons(message)
 
-            if not self.command_inputs['muted'] and message != '' and not(any(char in message for char in self.banned_chars)):
+            if not self.command_inputs['muted'] and message != '' and not(any(char in message for char in self.banned_chars)) and (len(message) < self.command_inputs['char_limit']):
 
                 pk = None
 
@@ -223,6 +229,10 @@ class SocketClient:
             elif any(char in message for char in self.banned_chars):
 
                 print("[!] You can't send a message with any of the characters ", self.banned_chars, " inside of it!")
+
+            elif len(message) > self.command_inputs['char_limit']:
+
+                print('[!] You message cannot be more than ', self.command_inputs['char_limit'], ' characters!')
             
 
 print(f'Running Chattap Client: v{version_tag}')
@@ -237,7 +247,22 @@ print()
 print('-' * 30)
 print()
 
-my_name = input('Please input a name: ')
+name_check = False
+banned_name_chars = ['%', '[', ']', '@', '~', '#', '/', ';']
+max_name_length = 25
+
+while not name_check:
+    
+    my_name = input('Please input a name: ')
+
+    if any(char in my_name for char in banned_name_chars):
+        print('[!] You cannot have you name using any of ', banned_name_chars)
+
+    elif len(my_name) > max_name_length:
+        print('[!] You name cannot be more than ', max_name_length, ' characters!')
+
+    else:
+        name_check = True
 
 print()
 
